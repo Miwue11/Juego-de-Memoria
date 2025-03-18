@@ -1,0 +1,122 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+body {
+  font-family: "Montserrat", sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(360deg, #81ddff, #013a62);
+}
+
+#contador {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #f9545a;
+  font-weight: bold;
+  text-align: center;
+}
+
+.container {
+  perspective: 1000px;
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 10px;
+  animation: fadeIn 0s ease-out;
+}
+
+.container > div {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(45deg, #f9545a, #fad0c4);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.695);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container > div:hover {
+  transform: scale(1.06);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+.container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.6s ease;
+  transform-origin: center;
+  background: linear-gradient(45deg, #f9545a, #fad0c4);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.695);
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+.flip {
+  animation: flip 0.4s forwards;
+}
+
+#botones {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+}
+
+button {
+  font-family: "Montserrat", sans-serif;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  background: linear-gradient(45deg, #f9545a, #fad0c4);
+  color: #0b030389;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.695);
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.07);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+#mensaje {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e24349;
+  text-align: center;
+  margin-top: 20px;
+}
+
+#tiempo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e24349;
+  text-align: center;
+  margin-top: 20px;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #e24349;
+  text-align: center;
+  margin-top: 20px;
+}

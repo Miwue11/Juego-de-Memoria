@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "typescript-sandbox",
+			"path": "../mirepro/typescript-sandbox"
+		},
+		{
+			"name": "ts-laboratorio",
+			"path": "../mirepro/ts-laboratorio"
+		}
+	],
+	"settings": {}
+}
