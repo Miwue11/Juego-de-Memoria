@@ -1,6 +1,6 @@
 export interface Carta {
-  idFoto: number; // Identificador único (por ejemplo, 1 y 2)
-  imagen: string; // URL de la imagen de frente
+  idFoto: number;
+  imagen: string;
   estaVuelta: boolean;
   encontrada: boolean;
 }
@@ -10,7 +10,6 @@ interface InfoCarta {
   imagen: string;
 }
 
-// Definimos dos cartas distintas
 const infoCartas: InfoCarta[] = [
   {
     idFoto: 1,
@@ -31,7 +30,6 @@ const crearCartaInicial = (idFoto: number, imagen: string): Carta => ({
   encontrada: false,
 });
 
-// Se crea el arreglo de cartas (dos cartas distintas)
 export const cartas: Carta[] = infoCartas.map((info) =>
   crearCartaInicial(info.idFoto, info.imagen)
 );

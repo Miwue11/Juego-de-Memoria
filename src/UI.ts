@@ -1,4 +1,4 @@
-import { tablero } from "./modelo";
+import { tablero, infoCartas } from "./modelo";
 import {
   iniciaPartida,
   sePuedeVoltearLaCarta,
@@ -36,19 +36,22 @@ export const iniciarInterfaz = (): void => {
 const configurarCartas = (): void => {
   const cartasDiv =
     document.querySelectorAll<HTMLDivElement>(".container > div");
-  cartasDiv.forEach((cartaDiv, indice) => {
-    const nuevoNodo = cartaDiv.cloneNode(true) as HTMLDivElement;
-    cartaDiv.parentNode?.replaceChild(nuevoNodo, cartaDiv);
-    const imagen = nuevoNodo.querySelector<HTMLImageElement>("img");
+  cartasDiv.forEach((cartaDiv, index) => {
+    const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
     if (imagen) {
       imagen.src = "/img/pngint.png";
       imagen.classList.remove("flip");
+      imagen.setAttribute(
+        "data-id-imagen",
+        tablero.cartas[index].idFoto.toString()
+      );
     }
-    nuevoNodo.addEventListener("click", () => onCartaClic(indice, nuevoNodo));
+    cartaDiv.onclick = null;
+    cartaDiv.onclick = () => CartaClick(index, cartaDiv);
   });
 };
 
-const onCartaClic = (indice: number, cartaDiv: HTMLDivElement): void => {
+const CartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
   if (tablero.estadoPartida === "PartidaCompleta" || turnoEnProceso) return;
 
   if (tablero.cartas[indice].estaVuelta) {
@@ -63,7 +66,14 @@ const onCartaClic = (indice: number, cartaDiv: HTMLDivElement): void => {
   if (!imagen) return;
   imagen.classList.add("flip");
   setTimeout(() => {
-    imagen.src = tablero.cartas[indice].imagen;
+    const idImagen = imagen.getAttribute("data-id-imagen");
+    if (idImagen) {
+      const idNumerico = parseInt(idImagen, 10);
+      const info = infoCartas.find((c) => c.idFoto === idNumerico);
+      if (info) {
+        imagen.src = info.imagen;
+      }
+    }
   }, DURACION_FLIP);
   imagen.addEventListener(
     "animationend",

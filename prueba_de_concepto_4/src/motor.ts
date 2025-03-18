@@ -1,6 +1,5 @@
 import { Tablero } from "./modelo";
 
-// Reinicia cada carta (pone ambas boca abajo) y el estado del tablero.
 export const iniciaPartida = (tablero: Tablero): void => {
   tablero.cartas.forEach((carta) => {
     carta.estaVuelta = false;
@@ -17,7 +16,7 @@ export const sePuedeVoltearLaCarta = (
 ): boolean => {
   const carta = tablero.cartas[indice];
   if (carta.encontrada || carta.estaVuelta) return false;
-  // Se permite voltear hasta dos cartas a la vez.
+
   const cartasVolteadas = tablero.cartas.filter(
     (c) => c.estaVuelta && !c.encontrada
   );
@@ -33,7 +32,6 @@ export const sonPareja = (
   tablero: Tablero
 ): boolean => tablero.cartas[indiceA].idFoto === tablero.cartas[indiceB].idFoto;
 
-// Como las dos cartas siempre son distintas, esta función se usa para revertir el estado.
 export const parejaNoEncontrada = (
   tablero: Tablero,
   indiceA: number,

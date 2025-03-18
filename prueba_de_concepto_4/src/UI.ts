@@ -6,15 +6,12 @@ import {
   parejaNoEncontrada,
 } from "./motor";
 
-// Constantes de tiempo (en milisegundos)
-const DURACION_FLIP = 400; // Duración total de la animación (0.4 s)
-const MITAD_FLIP = DURACION_FLIP / 2; // 200 ms para cambiar la imagen
-const TIEMPO_ESPERA = 800; // Tiempo que se muestran ambas cartas si no son pareja (0.8 s)
+const DURACION_FLIP = 400;
+const MITAD_FLIP = DURACION_FLIP / 2;
+const TIEMPO_ESPERA = 800;
 
-// Variable para evitar clics adicionales durante el turno
 let turnoEnProceso = false;
 
-// Función que inicia el juego (se llama desde shell.ts)
 export const iniciarJuego = (): void => {
   iniciaPartida(tablero);
   configurarCartas();
@@ -24,7 +21,7 @@ export const iniciarJuego = (): void => {
 const configurarCartas = (): void => {
   const container = document.querySelector<HTMLDivElement>(".container");
   if (!container) return;
-  // Reconstruye el contenido del contenedor para que tenga dos cartas.
+
   container.innerHTML = `
     <div><img class="card-image" src="/img/pngint.png" alt="Carta" /></div>
     <div><img class="card-image" src="/img/pngint.png" alt="Carta" /></div>
@@ -36,26 +33,20 @@ const configurarCartas = (): void => {
 };
 
 const onCartaClic = (indice: number, cartaDiv: HTMLDivElement): void => {
-  // Evita clics si ya se está procesando el turno o si la partida ha terminado.
   if (turnoEnProceso) return;
 
-  // Si la carta ya está volteada, muestra un aviso por 400 ms.
   if (tablero.cartas[indice].estaVuelta) {
     mostrarMensaje("La carta ya está volteada.", true);
     return;
   }
 
-  // Verifica si se puede voltear la carta.
   if (!sePuedeVoltearLaCarta(tablero, indice)) return;
 
-  // Marca la carta como volteada en el modelo.
   voltearLaCarta(tablero, indice);
 
-  // Obtiene la imagen del contenedor.
   const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
   if (!imagen) return;
 
-  // Aplica la animación de flip.
   imagen.classList.add("flip");
   setTimeout(() => {
     imagen.src = tablero.cartas[indice].imagen;
@@ -68,7 +59,6 @@ const onCartaClic = (indice: number, cartaDiv: HTMLDivElement): void => {
     { once: true }
   );
 
-  // Control del turno con switch.
   switch (tablero.estadoPartida) {
     case "CeroCartasLevantadas":
       tablero.indiceCartaVolteadaA = indice;
@@ -81,7 +71,6 @@ const onCartaClic = (indice: number, cartaDiv: HTMLDivElement): void => {
       const indiceA = tablero.indiceCartaVolteadaA!;
       const indiceB = tablero.indiceCartaVolteadaB!;
 
-      // Dado que las cartas son siempre distintas, no forman pareja.
       setTimeout(() => {
         parejaNoEncontrada(tablero, indiceA, indiceB);
         actualizarImagenCarta(indiceA, "/img/pngint.png");
@@ -111,7 +100,6 @@ const actualizarImagenCarta = (indice: number, src: string): void => {
   }
 };
 
-// Función para mostrar un mensaje de aviso; si autoClear es true, se borra en 400 ms.
 const mostrarMensaje = (texto: string, autoClear: boolean = true): void => {
   const mensaje = document.getElementById("mensaje");
   if (mensaje) {
