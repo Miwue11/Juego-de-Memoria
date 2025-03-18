@@ -10,7 +10,7 @@ interface InfoCarta {
   imagen: string;
 }
 
-const infoCartas: InfoCarta[] = [
+export const infoCartas: InfoCarta[] = [
   {
     idFoto: 1,
     imagen:

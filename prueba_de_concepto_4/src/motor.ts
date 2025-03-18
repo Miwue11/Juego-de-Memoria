@@ -1,6 +1,6 @@
-import { Tablero } from "./modelo";
+import { Tablero, tablero } from "./modelo";
 
-export const iniciaPartida = (tablero: Tablero): void => {
+export const iniciaPartida = (): void => {
   tablero.cartas.forEach((carta) => {
     carta.estaVuelta = false;
     carta.encontrada = false;
@@ -23,15 +23,16 @@ export const sePuedeVoltearLaCarta = (
   return cartasVolteadas.length < 2;
 };
 
-export const voltearLaCarta = (tablero: Tablero, indice: number) =>
+export const voltearLaCarta = (indice: number) =>
   (tablero.cartas[indice].estaVuelta = true);
 
-export const sonPareja = (
-  indiceA: number,
-  indiceB: number,
-  tablero: Tablero
-): boolean => tablero.cartas[indiceA].idFoto === tablero.cartas[indiceB].idFoto;
+export const sonPareja = (indiceA: number, indiceB: number): boolean =>
+  tablero.cartas[indiceA].idFoto === tablero.cartas[indiceB].idFoto;
 
+export const parejaEncontrada = (indiceA: number, indiceB: number): void => {
+  tablero.cartas[indiceA].encontrada = true;
+  tablero.cartas[indiceB].encontrada = true;
+};
 export const parejaNoEncontrada = (
   tablero: Tablero,
   indiceA: number,

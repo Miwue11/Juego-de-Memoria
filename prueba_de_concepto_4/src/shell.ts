@@ -1,5 +1,5 @@
-import { iniciarJuego } from "./UI";
+import { iniciarPartida } from "./UI";
 
 document.addEventListener("DOMContentLoaded", () => {
-  iniciarJuego();
+  iniciarPartida();
 });

@@ -1,10 +1,10 @@
 const container = document.getElementById("container");
 const imagen = document.getElementById("imagen") as HTMLImageElement;
-let flipping = false;
+let volteo = false;
 
 container?.addEventListener("click", () => {
-  if (flipping) return;
-  flipping = true;
+  if (volteo) return;
+  volteo = true;
   imagen.classList.add("flip");
 
   setTimeout(() => {
@@ -20,7 +20,7 @@ container?.addEventListener("click", () => {
     "animationend",
     () => {
       imagen.classList.remove("flip");
-      flipping = false;
+      volteo = false;
     },
     { once: true }
   );

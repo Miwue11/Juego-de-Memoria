@@ -36,19 +36,39 @@ export const iniciarInterfaz = (): void => {
 const configurarCartas = (): void => {
   const cartasDiv =
     document.querySelectorAll<HTMLDivElement>(".container > div");
-  cartasDiv.forEach((cartaDiv, index) => {
+  cartasDiv.forEach((cartaDiv, indice) => {
     const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
     if (imagen) {
       imagen.src = "/img/pngint.png";
       imagen.classList.remove("flip");
       imagen.setAttribute(
         "data-id-imagen",
-        tablero.cartas[index].idFoto.toString()
+        tablero.cartas[indice].idFoto.toString()
       );
     }
     cartaDiv.onclick = null;
-    cartaDiv.onclick = () => CartaClick(index, cartaDiv);
+    cartaDiv.onclick = () => CartaClick(indice, cartaDiv);
   });
+};
+
+export const girarCarta = (indice: number): void => {
+  const cartaDiv = document.querySelector(
+    `img[data-id-carta="${indice}"]`
+  ) as HTMLImageElement;
+
+  if (cartaDiv) {
+    const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
+    if (imagen) {
+      imagen.src = infoCartas[indice].imagen;
+      imagen.classList.add("flip");
+    } else {
+      console.error(
+        `No se encontró la imagen en el contenedor con data-id-carta="${indice}"`
+      );
+    }
+  } else {
+    console.error(`No se encontró el contenedor con data-id-carta="${indice}"`);
+  }
 };
 
 const CartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
