@@ -1,4 +1,5 @@
-import { Carta, Tablero, tablero } from "./modelo";
+import { TIEMPO_ESPERA } from "./constantes";
+import { Carta, Tablero } from "./modelo";
 
 const barajarCartas = (cartas: Carta[]): Carta[] => {
   const copia = [...cartas];
@@ -9,7 +10,7 @@ const barajarCartas = (cartas: Carta[]): Carta[] => {
   return copia;
 };
 
-export const sePuedeVoltearLaCarta = (indice: number): boolean => {
+const sePuedeVoltearLaCarta = (tablero: Tablero, indice: number): boolean => {
   const carta = tablero.cartas[indice];
   if (carta.encontrada || carta.estaVuelta) return false;
   const cartasVolteadas = tablero.cartas.filter(
@@ -18,25 +19,51 @@ export const sePuedeVoltearLaCarta = (indice: number): boolean => {
   return cartasVolteadas.length < 2;
 };
 
-export const voltearLaCarta = (indice: number): void => {
+const voltearLaCarta = (tablero: Tablero, indice: number): void => {
+  if (!sePuedeVoltearLaCarta(tablero, indice)) return;
   tablero.cartas[indice].estaVuelta = true;
+  if (tablero.indiceCartaVolteadaA === undefined) {
+    tablero.indiceCartaVolteadaA = indice;
+  } else {
+    tablero.indiceCartaVolteadaB = indice;
+  }
 };
 
-export const sonPareja = (indiceA: number, indiceB: number): boolean => {
-  return tablero.cartas[indiceA].idFoto === tablero.cartas[indiceB].idFoto;
+export const sonPareja = (
+  tablero: Tablero,
+  indiceA: number,
+  indiceB: number
+): boolean => {
+  const esPareja =
+    tablero.cartas[indiceA].idFoto === tablero.cartas[indiceB].idFoto;
+
+  if (esPareja) {
+    parejaEncontrada(tablero, indiceA, indiceB);
+  } else {
+    setTimeout(() => {
+      parejaNoEncontrada(tablero, indiceA, indiceB);
+    }, TIEMPO_ESPERA / 1.5);
+  }
+  voltearLaCarta(tablero, indiceA);
+  voltearLaCarta(tablero, indiceB);
+  return esPareja;
 };
 
-export const parejaEncontrada = (indiceA: number, indiceB: number): void => {
+const parejaEncontrada = (
+  tablero: Tablero,
+  indiceA: number,
+  indiceB: number
+): void => {
   tablero.cartas[indiceA].encontrada = true;
   tablero.cartas[indiceB].encontrada = true;
-  tablero.estadoPartida = esPartidaCompleta()
+  tablero.estadoPartida = esPartidaCompleta(tablero)
     ? "PartidaCompleta"
-    : "CeroCartasLevantadas";
+    : "UnaCartaLevantada";
   tablero.indiceCartaVolteadaA = undefined;
   tablero.indiceCartaVolteadaB = undefined;
 };
 
-export const parejaNoEncontrada = (
+const parejaNoEncontrada = (
   tablero: Tablero,
   indiceA: number,
   indiceB: number
@@ -48,11 +75,11 @@ export const parejaNoEncontrada = (
   tablero.indiceCartaVolteadaB = undefined;
 };
 
-export const esPartidaCompleta = (): boolean => {
+export const esPartidaCompleta = (tablero: Tablero): boolean => {
   return tablero.cartas.every((carta) => carta.encontrada);
 };
 
-export const iniciaPartida = (): void => {
+export const iniciaPartida = (tablero: Tablero): void => {
   tablero.cartas = barajarCartas(tablero.cartas).map((carta) => ({
     ...carta,
     estaVuelta: false,
