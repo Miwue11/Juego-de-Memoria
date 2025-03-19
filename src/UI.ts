@@ -4,51 +4,46 @@ import { DURACION_FLIP, TIEMPO_ESPERA } from "./constantes";
 
 let turnoEnProceso: boolean = false;
 
-export const iniciarInterfaz = (): void => {
+const ocultarBotones = (): void => {
   const btnJugar = document.getElementById("btnJugar");
   const btnReiniciar = document.getElementById("btnReiniciar");
+  if (btnJugar) btnJugar.style.display = "none";
+  if (btnReiniciar) btnReiniciar.style.display = "none";
+};
+const eventosJugar = (): void => {
+  const btnJugar = document.getElementById("btnJugar");
   btnJugar?.addEventListener("click", () => {
     iniciaPartida(tablero);
     actualizarContador(0);
     limpiarMensaje();
     configurarCartas();
-    (btnJugar as HTMLButtonElement).style.display = "none";
-    (btnReiniciar as HTMLButtonElement).style.display = "none";
+    ocultarBotones();
   });
+};
+const eventosReiniciar = (): void => {
+  const btnReiniciar = document.getElementById("btnReiniciar");
   btnReiniciar?.addEventListener("click", () => {
     iniciaPartida(tablero);
     actualizarContador(0);
     limpiarMensaje();
     configurarCartas();
     turnoEnProceso = false;
-    (btnReiniciar as HTMLButtonElement).style.display = "none";
+    ocultarBotones();
   });
+};
+
+export const iniciarInterfaz = (): void => {
+  eventosJugar();
+  eventosReiniciar();
   if (!tablero) console.error("Tablero no inicializado");
 };
 
-const configurarCartas = (): void => {
-  const cartasDiv =
-    document.querySelectorAll<HTMLDivElement>(".container > div");
-  cartasDiv.forEach((cartaDiv, indice) => {
-    const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
-    if (imagen) {
-      imagen.src = "/img/pngint.png";
-      imagen.classList.remove("flip");
-      imagen.setAttribute(
-        "data-id-imagen",
-        tablero.cartas[indice].idFoto.toString()
-      );
-    }
-    cartaDiv.onclick = null;
-    cartaDiv.onclick = () => cartaClick(indice, cartaDiv);
-  });
-  if (!cartasDiv) console.error("no se encontraron las cartas");
+const EventosClick = (cartaDiv: HTMLDivElement, indice: number) => {
+  cartaDiv.onclick = null;
+  cartaDiv.onclick = () => cartaClick(indice, cartaDiv);
 };
 
-export const girarCarta = (indice: number): void => {
-  const cartaDiv = document.querySelector(
-    `img[data-id-carta="${indice}"]`
-  ) as HTMLImageElement;
+const añadiendoFlipImagen = (cartaDiv: HTMLDivElement, indice: number) => {
   if (cartaDiv) {
     const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
     if (imagen) {
@@ -64,11 +59,55 @@ export const girarCarta = (indice: number): void => {
   }
 };
 
+const quitandoFlipImagen = (cartaDiv: HTMLDivElement, indice: number) => {
+  const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
+  if (imagen) {
+    imagen.src = "/img/pngint.png";
+    imagen.classList.remove("flip");
+    imagen.setAttribute(
+      "data-id-imagen",
+      tablero.cartas[indice].idFoto.toString()
+    );
+  }
+  EventosClick(cartaDiv, indice);
+};
+
+const seleccionDeCartas = (cartasDiv: NodeListOf<HTMLDivElement>) => {
+  cartasDiv.forEach((cartaDiv, indice) => {
+    quitandoFlipImagen(cartaDiv, indice);
+  });
+};
+
+const configurarCartas = (): void => {
+  const cartasDiv =
+    document.querySelectorAll<HTMLDivElement>(".container > div");
+  seleccionDeCartas(cartasDiv);
+  if (!cartasDiv) console.error("no se encontraron las cartas");
+};
+
+export const girarCarta = (indice: number): void => {
+  const cartaDiv = document.querySelector(
+    `img[data-id-carta="${indice}"]`
+  ) as HTMLImageElement;
+  añadiendoFlipImagen(cartaDiv, indice);
+};
+
 const mostrarImagen = (cartaDiv: HTMLDivElement) => {
   const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
   if (!imagen) return;
   else console.error("No se encontró la imagen");
   imagen.classList.add("flip");
+  setImagen(imagen);
+  imagen.addEventListener(
+    "animationend",
+    () => {
+      imagen.classList.remove("flip");
+    },
+    { once: true }
+  );
+};
+
+const setImagen = (imagen: HTMLImageElement) => {
   setTimeout(() => {
     const idImagen = imagen.getAttribute("data-id-imagen");
     if (idImagen) {
@@ -83,13 +122,6 @@ const mostrarImagen = (cartaDiv: HTMLDivElement) => {
       console.error("No se encontró el atributo data-id-imagen");
     }
   }, DURACION_FLIP);
-  imagen.addEventListener(
-    "animationend",
-    () => {
-      imagen.classList.remove("flip");
-    },
-    { once: true }
-  );
 };
 
 const actualizarImagenCarta = (indice: number, src: string): void => {
