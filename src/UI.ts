@@ -100,34 +100,27 @@ const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
   mostrarImagen(cartaDiv);
   switch (tablero.estadoPartida) {
     case "CeroCartasLevantadas":
-      // Primera carta: se guarda el índice y se voltea la carta directamente
       tablero.indiceCartaVolteadaA = indice;
       tablero.estadoPartida = "UnaCartaLevantada";
       tablero.cartas[indice].estaVuelta = true;
-      // Actualizamos la imagen de la carta para mostrar su cara (suponiendo que idFoto contiene la ruta de la imagen)
       (cartaDiv as HTMLImageElement).src = tablero.cartas[indice].imagen;
       break;
 
     case "UnaCartaLevantada":
-      // Segunda carta: se bloquea la interacción y se actualiza el estado
       turnoEnProceso = true;
       tablero.indiceCartaVolteadaB = indice;
       tablero.estadoPartida = "DosCartasLevantadas";
       tablero.cartas[indice].estaVuelta = true;
       (cartaDiv as HTMLImageElement).src = tablero.cartas[indice].imagen;
-
-      // Actualizar el contador de intentos
       const intentosActuales = parseInt(
         document
           .getElementById("contador")
           ?.textContent?.replace("Intentos: ", "") || "0"
       );
       actualizarContador(intentosActuales + 1);
-
       const indiceA = tablero.indiceCartaVolteadaA!;
       const indiceB = tablero.indiceCartaVolteadaB!;
 
-      // Comprobar si las dos cartas forman pareja
       if (sonPareja(tablero, indiceA, indiceB)) {
         tablero.cartas[indiceA].encontrada = true;
         tablero.cartas[indiceB].encontrada = true;
@@ -143,8 +136,6 @@ const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
           if (cartaB) (cartaB as HTMLImageElement).src = "/img/pngint.png";
         }, TIEMPO_ESPERA);
       }
-
-      // Reiniciar el turno y actualizar el estado global después del tiempo de espera
       setTimeout(() => {
         tablero.indiceCartaVolteadaA = undefined;
         tablero.indiceCartaVolteadaB = undefined;
@@ -171,7 +162,6 @@ const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
       break;
 
     case "DosCartasLevantadas":
-      // Si ya hay dos cartas levantadas, se muestra el mensaje correspondiente
       mostrarMensaje("Ya hay dos cartas levantadas.", true);
       break;
 
