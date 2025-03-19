@@ -23,6 +23,7 @@ export const iniciarInterfaz = (): void => {
     turnoEnProceso = false;
     (btnReiniciar as HTMLButtonElement).style.display = "none";
   });
+  if (!tablero) console.error("Tablero no inicializado");
 };
 
 const configurarCartas = (): void => {
@@ -41,6 +42,7 @@ const configurarCartas = (): void => {
     cartaDiv.onclick = null;
     cartaDiv.onclick = () => cartaClick(indice, cartaDiv);
   });
+  if (!cartasDiv) console.error("no se encontraron las cartas");
 };
 
 export const girarCarta = (indice: number): void => {
@@ -65,6 +67,7 @@ export const girarCarta = (indice: number): void => {
 const mostrarImagen = (cartaDiv: HTMLDivElement) => {
   const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
   if (!imagen) return;
+  else console.error("No se encontró la imagen");
   imagen.classList.add("flip");
   setTimeout(() => {
     const idImagen = imagen.getAttribute("data-id-imagen");
@@ -73,7 +76,11 @@ const mostrarImagen = (cartaDiv: HTMLDivElement) => {
       const info = infoCartas.find((c) => c.idFoto === idNumerico);
       if (info) {
         imagen.src = info.imagen;
+      } else {
+        console.error(`No se encontró la imagen con id ${idNumerico}`);
       }
+    } else {
+      console.error("No se encontró el atributo data-id-imagen");
     }
   }, DURACION_FLIP);
   imagen.addEventListener(
@@ -87,15 +94,16 @@ const mostrarImagen = (cartaDiv: HTMLDivElement) => {
 
 const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
   if (tablero.estadoPartida === "PartidaCompleta" || turnoEnProceso) return;
+  else console.error("No se encontró el contenedor");
 
   if (tablero.cartas[indice].estaVuelta) {
     mostrarMensaje("La carta ya está volteada.", true);
     return;
-  }
+  } else console.error("No se encontró la imagen");
   if (turnoEnProceso) {
     mostrarMensaje("Espera a que termine el turno actual.", true);
     return;
-  }
+  } else console.error("No se encontró la imagen");
 
   mostrarImagen(cartaDiv);
   switch (tablero.estadoPartida) {
@@ -176,12 +184,15 @@ const actualizarImagenCarta = (indice: number, src: string): void => {
   const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
   if (imagen) {
     imagen.src = src;
+  } else {
+    console.error("No se encontró la imagen");
   }
 };
 
 const actualizarContador = (nuevoNumero: number): void => {
   const contadorElem = document.getElementById("contador");
   if (contadorElem) contadorElem.textContent = "Intentos: " + nuevoNumero;
+  else console.error("No se encontró el elemento con id 'contador'");
 };
 
 const mostrarMensaje = (texto: string, autoClear: boolean = true): void => {
@@ -192,11 +203,16 @@ const mostrarMensaje = (texto: string, autoClear: boolean = true): void => {
       setTimeout(() => {
         mensajeElem.textContent = "";
       }, TIEMPO_ESPERA);
+    } else {
+      console.error("No se encontró el elemento con id 'mensaje'");
     }
+  } else {
+    console.error("No se encontró el elemento con id 'mensaje'");
   }
 };
 
 const limpiarMensaje = (): void => {
   const mensajeElem = document.getElementById("mensaje");
   if (mensajeElem) mensajeElem.textContent = "";
+  else console.error("No se encontró el elemento con id 'mensaje'");
 };
