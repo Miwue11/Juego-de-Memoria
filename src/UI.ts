@@ -92,92 +92,6 @@ const mostrarImagen = (cartaDiv: HTMLDivElement) => {
   );
 };
 
-const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
-  if (tablero.estadoPartida === "PartidaCompleta" || turnoEnProceso) return;
-  else console.error("No se encontró el contenedor");
-
-  if (tablero.cartas[indice].estaVuelta) {
-    mostrarMensaje("La carta ya está volteada.", true);
-    return;
-  } else console.error("No se encontró la imagen");
-  if (turnoEnProceso) {
-    mostrarMensaje("Espera a que termine el turno actual.", true);
-    return;
-  } else console.error("No se encontró la imagen");
-
-  mostrarImagen(cartaDiv);
-  switch (tablero.estadoPartida) {
-    case "CeroCartasLevantadas":
-      tablero.indiceCartaVolteadaA = indice;
-      tablero.estadoPartida = "UnaCartaLevantada";
-      tablero.cartas[indice].estaVuelta = true;
-      (cartaDiv as HTMLImageElement).src = tablero.cartas[indice].imagen;
-      break;
-
-    case "UnaCartaLevantada":
-      turnoEnProceso = true;
-      tablero.indiceCartaVolteadaB = indice;
-      tablero.estadoPartida = "DosCartasLevantadas";
-      tablero.cartas[indice].estaVuelta = true;
-      (cartaDiv as HTMLImageElement).src = tablero.cartas[indice].imagen;
-      const intentosActuales = parseInt(
-        document
-          .getElementById("contador")
-          ?.textContent?.replace("Intentos: ", "") || "0"
-      );
-      actualizarContador(intentosActuales + 1);
-      const indiceA = tablero.indiceCartaVolteadaA!;
-      const indiceB = tablero.indiceCartaVolteadaB!;
-
-      if (sonPareja(tablero, indiceA, indiceB)) {
-        tablero.cartas[indiceA].encontrada = true;
-        tablero.cartas[indiceB].encontrada = true;
-      } else {
-        setTimeout(() => {
-          tablero.cartas[indiceA].estaVuelta = false;
-          tablero.cartas[indiceB].estaVuelta = false;
-          actualizarImagenCarta(indiceA, "/img/pngint.png");
-          actualizarImagenCarta(indiceB, "/img/pngint.png");
-          const cartaA = document.getElementById(`carta-${indiceA}`);
-          const cartaB = document.getElementById(`carta-${indiceB}`);
-          if (cartaA) (cartaA as HTMLImageElement).src = "/img/pngint.png";
-          if (cartaB) (cartaB as HTMLImageElement).src = "/img/pngint.png";
-        }, TIEMPO_ESPERA);
-      }
-      setTimeout(() => {
-        tablero.indiceCartaVolteadaA = undefined;
-        tablero.indiceCartaVolteadaB = undefined;
-        if (!esPartidaCompleta(tablero)) {
-          tablero.estadoPartida = "CeroCartasLevantadas";
-        }
-        turnoEnProceso = false;
-        if (esPartidaCompleta(tablero)) {
-          tablero.estadoPartida = "PartidaCompleta";
-          const btnReiniciar = document.getElementById("btnReiniciar");
-          if (btnReiniciar) {
-            (btnReiniciar as HTMLElement).style.display = "inline-block";
-          }
-          mostrarMensaje(
-            `¡Felicidades! Has completado la partida en ${parseInt(
-              document
-                .getElementById("contador")
-                ?.textContent?.replace("Intentos: ", "") || "0"
-            )} intentos!`,
-            false
-          );
-        }
-      }, TIEMPO_ESPERA);
-      break;
-
-    case "DosCartasLevantadas":
-      mostrarMensaje("Ya hay dos cartas levantadas.", true);
-      break;
-
-    default:
-      break;
-  }
-};
-
 const actualizarImagenCarta = (indice: number, src: string): void => {
   const cartaDiv =
     document.querySelectorAll<HTMLDivElement>(".container > div")[indice];
@@ -193,6 +107,133 @@ const actualizarContador = (nuevoNumero: number): void => {
   const contadorElem = document.getElementById("contador");
   if (contadorElem) contadorElem.textContent = "Intentos: " + nuevoNumero;
   else console.error("No se encontró el elemento con id 'contador'");
+};
+
+const jugando = (): boolean =>
+  tablero.estadoPartida === "PartidaCompleta" || turnoEnProceso;
+
+const esCartaVolteada = (indice: number): boolean =>
+  tablero.cartas[indice].estaVuelta;
+
+const mostrarImagenCarta = (cartaDiv: HTMLDivElement, indice: number): void => {
+  (cartaDiv as HTMLImageElement).src = tablero.cartas[indice].imagen;
+  mostrarImagen(cartaDiv);
+};
+
+const primerVolteo = (indice: number, cartaDiv: HTMLDivElement): void => {
+  tablero.indiceCartaVolteadaA = indice;
+  tablero.estadoPartida = "UnaCartaLevantada";
+  tablero.cartas[indice].estaVuelta = true;
+  mostrarImagenCarta(cartaDiv, indice);
+};
+
+const actualizarContadorIntentos = (): void => {
+  const contadorElement = document.getElementById("contador");
+  const intentosActuales = parseInt(
+    contadorElement?.textContent?.replace("Intentos: ", "") || "0"
+  );
+  actualizarContador(intentosActuales + 1);
+};
+
+const marcarParejaEncontrada = (indiceA: number, indiceB: number): void => {
+  tablero.cartas[indiceA].encontrada = true;
+  tablero.cartas[indiceB].encontrada = true;
+};
+
+const voltearCartasTrasRetraso = (indiceA: number, indiceB: number): void => {
+  setTimeout(() => {
+    tablero.cartas[indiceA].estaVuelta = false;
+    tablero.cartas[indiceB].estaVuelta = false;
+    actualizarImagenCarta(indiceA, "/img/pngint.png");
+    actualizarImagenCarta(indiceB, "/img/pngint.png");
+    const cartaA = document.getElementById(
+      `carta-${indiceA}`
+    ) as HTMLImageElement;
+    const cartaB = document.getElementById(
+      `carta-${indiceB}`
+    ) as HTMLImageElement;
+    if (cartaA) cartaA.src = "/img/pngint.png";
+    if (cartaB) cartaB.src = "/img/pngint.png";
+  }, TIEMPO_ESPERA);
+};
+
+const reiniciarTurnoTrasRetraso = (): void => {
+  setTimeout(() => {
+    tablero.indiceCartaVolteadaA = undefined;
+    tablero.indiceCartaVolteadaB = undefined;
+    turnoEnProceso = false;
+    if (!esPartidaCompleta(tablero)) {
+      tablero.estadoPartida = "CeroCartasLevantadas";
+    } else {
+      finalizarPartida();
+    }
+  }, TIEMPO_ESPERA);
+};
+
+const finalizarPartida = (): void => {
+  tablero.estadoPartida = "PartidaCompleta";
+  const btnReiniciar = document.getElementById("btnReiniciar");
+  if (btnReiniciar) {
+    (btnReiniciar as HTMLElement).style.display = "inline-block";
+  }
+  const contadorElement = document.getElementById("contador");
+  const intentos = parseInt(
+    contadorElement?.textContent?.replace("Intentos: ", "") || "0"
+  );
+  mostrarMensaje(
+    `¡Felicidades! Has completado la partida en ${intentos} intentos!`,
+    false
+  );
+};
+
+const segundoVolteo = (indice: number, cartaDiv: HTMLDivElement): void => {
+  turnoEnProceso = true;
+  tablero.indiceCartaVolteadaB = indice;
+  tablero.estadoPartida = "DosCartasLevantadas";
+  tablero.cartas[indice].estaVuelta = true;
+  mostrarImagenCarta(cartaDiv, indice);
+  actualizarContadorIntentos();
+
+  const indiceA = tablero.indiceCartaVolteadaA!;
+  const indiceB = tablero.indiceCartaVolteadaB!;
+
+  if (sonPareja(tablero, indiceA, indiceB)) {
+    marcarParejaEncontrada(indiceA, indiceB);
+  } else {
+    voltearCartasTrasRetraso(indiceA, indiceB);
+  }
+  reiniciarTurnoTrasRetraso();
+};
+
+const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
+  if (jugando()) return;
+
+  if (esCartaVolteada(indice)) {
+    mostrarMensaje("La carta ya está volteada.", true);
+    return;
+  }
+
+  if (turnoEnProceso) {
+    mostrarMensaje("Espera a que termine el turno actual.", true);
+    return;
+  }
+
+  switch (tablero.estadoPartida) {
+    case "CeroCartasLevantadas":
+      primerVolteo(indice, cartaDiv);
+      break;
+
+    case "UnaCartaLevantada":
+      segundoVolteo(indice, cartaDiv);
+      break;
+
+    case "DosCartasLevantadas":
+      mostrarMensaje("Ya hay dos cartas levantadas.", true);
+      break;
+
+    default:
+      break;
+  }
 };
 
 const mostrarMensaje = (texto: string, autoClear: boolean = true): void => {
