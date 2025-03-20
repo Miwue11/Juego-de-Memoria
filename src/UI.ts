@@ -1,4 +1,4 @@
-import { tablero, infoCartas } from "./modelo";
+import { Tablero, infoCartas } from "./modelo";
 import { iniciaPartida, sonPareja, esPartidaCompleta } from "./motor";
 import { DURACION_FLIP, TIEMPO_ESPERA } from "./constantes";
 
@@ -10,40 +10,48 @@ const ocultarBotones = (): void => {
   if (btnJugar) btnJugar.style.display = "none";
   if (btnReiniciar) btnReiniciar.style.display = "none";
 };
-const eventosJugar = (): void => {
+const eventosJugar = (tablero: Tablero): void => {
   const btnJugar = document.getElementById("btnJugar");
   btnJugar?.addEventListener("click", () => {
     iniciaPartida(tablero);
     actualizarContador(0);
     limpiarMensaje();
-    configurarCartas();
+    configurarCartas(tablero);
     ocultarBotones();
   });
 };
-const eventosReiniciar = (): void => {
+const eventosReiniciar = (tablero: Tablero): void => {
   const btnReiniciar = document.getElementById("btnReiniciar");
   btnReiniciar?.addEventListener("click", () => {
     iniciaPartida(tablero);
     actualizarContador(0);
     limpiarMensaje();
-    configurarCartas();
+    configurarCartas(tablero);
     turnoEnProceso = false;
     ocultarBotones();
   });
 };
 
-export const iniciarInterfaz = (): void => {
-  eventosJugar();
-  eventosReiniciar();
+export const iniciarInterfaz = (tablero: Tablero): void => {
+  eventosJugar(tablero);
+  eventosReiniciar(tablero);
   if (!tablero) console.error("Tablero no inicializado");
 };
 
-const EventosClick = (cartaDiv: HTMLDivElement, indice: number) => {
+const EventosClick = (
+  tablero: Tablero,
+  cartaDiv: HTMLDivElement,
+  indice: number
+) => {
   cartaDiv.onclick = null;
-  cartaDiv.onclick = () => cartaClick(indice, cartaDiv);
+  cartaDiv.onclick = () => cartaClick(tablero, indice, cartaDiv);
 };
 
-const quitandoFlipImagen = (cartaDiv: HTMLDivElement, indice: number) => {
+const quitandoFlipImagen = (
+  tablero: Tablero,
+  cartaDiv: HTMLDivElement,
+  indice: number
+) => {
   const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
   if (imagen) {
     imagen.src = "/img/pngint.png";
@@ -53,19 +61,22 @@ const quitandoFlipImagen = (cartaDiv: HTMLDivElement, indice: number) => {
       tablero.cartas[indice].idFoto.toString()
     );
   }
-  EventosClick(cartaDiv, indice);
+  EventosClick(tablero, cartaDiv, indice);
 };
 
-const seleccionDeCartas = (cartasDiv: NodeListOf<HTMLDivElement>) => {
+const seleccionDeCartas = (
+  tablero: Tablero,
+  cartasDiv: NodeListOf<HTMLDivElement>
+) => {
   cartasDiv.forEach((cartaDiv, indice) => {
-    quitandoFlipImagen(cartaDiv, indice);
+    quitandoFlipImagen(tablero, cartaDiv, indice);
   });
 };
 
-const configurarCartas = (): void => {
+const configurarCartas = (tablero: Tablero): void => {
   const cartasDiv =
     document.querySelectorAll<HTMLDivElement>(".container > div");
-  seleccionDeCartas(cartasDiv);
+  seleccionDeCartas(tablero, cartasDiv);
   if (!cartasDiv) console.error("no se encontraron las cartas");
 };
 
@@ -118,22 +129,30 @@ const actualizarContador = (nuevoNumero: number): void => {
   else console.error("No se encontró el elemento con id 'contador'");
 };
 
-const jugando = (): boolean =>
+const jugando = (tablero: Tablero): boolean =>
   tablero.estadoPartida === "PartidaCompleta" || turnoEnProceso;
 
-const esCartaVolteada = (indice: number): boolean =>
+const esCartaVolteada = (tablero: Tablero, indice: number): boolean =>
   tablero.cartas[indice].estaVuelta;
 
-const mostrarImagenCarta = (cartaDiv: HTMLDivElement, indice: number): void => {
+const mostrarImagenCarta = (
+  tablero: Tablero,
+  cartaDiv: HTMLDivElement,
+  indice: number
+): void => {
   (cartaDiv as HTMLImageElement).src = tablero.cartas[indice].imagen;
   mostrarImagen(cartaDiv);
 };
 
-const primerVolteo = (indice: number, cartaDiv: HTMLDivElement): void => {
+const primerVolteo = (
+  tablero: Tablero,
+  indice: number,
+  cartaDiv: HTMLDivElement
+): void => {
   tablero.indiceCartaVolteadaA = indice;
   tablero.estadoPartida = "UnaCartaLevantada";
   tablero.cartas[indice].estaVuelta = true;
-  mostrarImagenCarta(cartaDiv, indice);
+  mostrarImagenCarta(tablero, cartaDiv, indice);
 };
 
 const actualizarContadorIntentos = (): void => {
@@ -144,12 +163,20 @@ const actualizarContadorIntentos = (): void => {
   actualizarContador(intentosActuales + 1);
 };
 
-const marcarParejaEncontrada = (indiceA: number, indiceB: number): void => {
+const marcarParejaEncontrada = (
+  tablero: Tablero,
+  indiceA: number,
+  indiceB: number
+): void => {
   tablero.cartas[indiceA].encontrada = true;
   tablero.cartas[indiceB].encontrada = true;
 };
 
-const voltearCartasTrasRetraso = (indiceA: number, indiceB: number): void => {
+const voltearCartasTrasRetraso = (
+  tablero: Tablero,
+  indiceA: number,
+  indiceB: number
+): void => {
   setTimeout(() => {
     tablero.cartas[indiceA].estaVuelta = false;
     tablero.cartas[indiceB].estaVuelta = false;
@@ -166,7 +193,7 @@ const voltearCartasTrasRetraso = (indiceA: number, indiceB: number): void => {
   }, TIEMPO_ESPERA);
 };
 
-const reiniciarTurnoTrasRetraso = (): void => {
+const reiniciarTurnoTrasRetraso = (tablero: Tablero): void => {
   setTimeout(() => {
     tablero.indiceCartaVolteadaA = undefined;
     tablero.indiceCartaVolteadaB = undefined;
@@ -174,12 +201,12 @@ const reiniciarTurnoTrasRetraso = (): void => {
     if (!esPartidaCompleta(tablero)) {
       tablero.estadoPartida = "CeroCartasLevantadas";
     } else {
-      finalizarPartida();
+      finalizarPartida(tablero);
     }
   }, TIEMPO_ESPERA);
 };
 
-const finalizarPartida = (): void => {
+const finalizarPartida = (tablero: Tablero): void => {
   tablero.estadoPartida = "PartidaCompleta";
   const btnReiniciar = document.getElementById("btnReiniciar");
   if (btnReiniciar) {
@@ -195,29 +222,37 @@ const finalizarPartida = (): void => {
   );
 };
 
-const segundoVolteo = (indice: number, cartaDiv: HTMLDivElement): void => {
+const segundoVolteo = (
+  tablero: Tablero,
+  indice: number,
+  cartaDiv: HTMLDivElement
+): void => {
   turnoEnProceso = true;
   tablero.indiceCartaVolteadaB = indice;
   tablero.estadoPartida = "DosCartasLevantadas";
   tablero.cartas[indice].estaVuelta = true;
-  mostrarImagenCarta(cartaDiv, indice);
+  mostrarImagenCarta(tablero, cartaDiv, indice);
   actualizarContadorIntentos();
 
   const indiceA = tablero.indiceCartaVolteadaA!;
   const indiceB = tablero.indiceCartaVolteadaB!;
 
   if (sonPareja(tablero, indiceA, indiceB)) {
-    marcarParejaEncontrada(indiceA, indiceB);
+    marcarParejaEncontrada(tablero, indiceA, indiceB);
   } else {
-    voltearCartasTrasRetraso(indiceA, indiceB);
+    voltearCartasTrasRetraso(tablero, indiceA, indiceB);
   }
-  reiniciarTurnoTrasRetraso();
+  reiniciarTurnoTrasRetraso(tablero);
 };
 
-const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
-  if (jugando()) return;
+const cartaClick = (
+  tablero: Tablero,
+  indice: number,
+  cartaDiv: HTMLDivElement
+): void => {
+  if (jugando(tablero)) return;
 
-  if (esCartaVolteada(indice)) {
+  if (esCartaVolteada(tablero, indice)) {
     mostrarMensaje("La carta ya está volteada.", true);
     return;
   }
@@ -229,11 +264,11 @@ const cartaClick = (indice: number, cartaDiv: HTMLDivElement): void => {
 
   switch (tablero.estadoPartida) {
     case "CeroCartasLevantadas":
-      primerVolteo(indice, cartaDiv);
+      primerVolteo(tablero, indice, cartaDiv);
       break;
 
     case "UnaCartaLevantada":
-      segundoVolteo(indice, cartaDiv);
+      segundoVolteo(tablero, indice, cartaDiv);
       break;
 
     case "DosCartasLevantadas":
