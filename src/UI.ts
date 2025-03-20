@@ -43,22 +43,6 @@ const EventosClick = (cartaDiv: HTMLDivElement, indice: number) => {
   cartaDiv.onclick = () => cartaClick(indice, cartaDiv);
 };
 
-const añadiendoFlipImagen = (cartaDiv: HTMLDivElement, indice: number) => {
-  if (cartaDiv) {
-    const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
-    if (imagen) {
-      imagen.src = infoCartas[indice].imagen;
-      imagen.classList.add("flip");
-    } else {
-      console.error(
-        `No se encontró la imagen en el contenedor con data-id-carta="${indice}"`
-      );
-    }
-  } else {
-    console.error(`No se encontró el contenedor con data-id-carta="${indice}"`);
-  }
-};
-
 const quitandoFlipImagen = (cartaDiv: HTMLDivElement, indice: number) => {
   const imagen = cartaDiv.querySelector<HTMLImageElement>("img");
   if (imagen) {
@@ -83,13 +67,6 @@ const configurarCartas = (): void => {
     document.querySelectorAll<HTMLDivElement>(".container > div");
   seleccionDeCartas(cartasDiv);
   if (!cartasDiv) console.error("no se encontraron las cartas");
-};
-
-export const girarCarta = (indice: number): void => {
-  const cartaDiv = document.querySelector(
-    `img[data-id-carta="${indice}"]`
-  ) as HTMLImageElement;
-  añadiendoFlipImagen(cartaDiv, indice);
 };
 
 const mostrarImagen = (cartaDiv: HTMLDivElement) => {
